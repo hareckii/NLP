@@ -9,3 +9,22 @@ sequence
 db schema
 ![alt text](docs/images/db_schema.png)
 
+## Start guide
+
+### Backend
+
+go to backend directory
+
+`cd backend/`
+
+activate virtual environment
+
+`source .venv/bin/activate` (ubuntu)
+
+install dependencies
+
+`pip install -r requirements.txt`
+
+run api
+
+`fastapi dev main.py`
