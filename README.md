@@ -1,4 +1,11 @@
-# Лабораторная №6 по дисциплине ЕЯЗИИС
+# Лабораторная №7 по дисциплине ЕЯЗИИС
 
-Для запуска телеграм-бота запустите в консоли Python 
-`python .\bot.py`
+use-case
+![alt text](docs/images/usecase.png)
+
+sequence
+![alt text](docs/images/sequence.png)
+
+db schema
+![alt text](docs/images/db_schema.png)
+
