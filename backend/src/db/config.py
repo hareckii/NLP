@@ -1,6 +1,11 @@
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy.orm import DeclarativeBase
 import asyncio
+
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
+from sqlalchemy.orm import DeclarativeBase
 
 
 class Base(DeclarativeBase):
@@ -16,7 +21,7 @@ class Database:
             future=True,
         )
         self.async_session_maker = async_sessionmaker(
-            self.engine, class_=AsyncSession, expire_on_commit=False
+            self.engine, class_=AsyncSession, expire_on_commit=False,
         )
 
     # основные методы для конфига бд

@@ -1,5 +1,6 @@
 from fastapi import FastAPI, status
-from src import search_router, llm_router, documents_router
+
+from src import documents_router, llm_router, search_router
 
 app = FastAPI()
 

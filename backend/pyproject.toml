@@ -23,3 +23,22 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.14.1"
 
+[tool.ruff]
+line-length=80
+
+[tool.ruff.lint]
+
+# Включение правил для импортов
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort (сортировка импортов)
+    "UP", # pyupgrade
+    "ARG", # unused arguments
+    "COM", # commas
+    "ERA", # commented out code
+    "FBT", # boolean trap
+]
+
+
