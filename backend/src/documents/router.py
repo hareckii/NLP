@@ -8,6 +8,7 @@ router = APIRouter(prefix="/documents")
 async def add_doc(file_path: str, title: str):
     pass
 
+
 @router.delete("/delete")
 async def delete_doc(title: str):
     pass
