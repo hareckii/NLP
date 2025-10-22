@@ -1,9 +1,12 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db.models import FileModel
+from src.db.repositories.repo import Repository
 
 
-class FileRepository:
+class FileRepository(Repository):
+    def __init__(self, session):
+        super().__init__(session)
 
     async def add_file(
         title: str,
