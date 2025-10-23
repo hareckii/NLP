@@ -5,14 +5,11 @@ from src.db.repositories.repo import Repository
 
 
 class WordRepository(Repository):
-    def __init__(self, session):
+    def __init__(self, session: AsyncSession):
         super().__init__(session)
 
     async def add_word(
-        word: str,
-        significance: float,
-        file_id: int,
-        session: AsyncSession,
+        self,
+        word: WordModel,
         ) -> None:
-        word = WordModel(word, significance, file_id)
-        session.add(word)
+        self.session.add(word)

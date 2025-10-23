@@ -8,5 +8,4 @@ class FileModel(BaseModel):
 
 class WordModel(BaseModel):
     word: str
-    significance: str
-    file: FileModel
+    frequency: int

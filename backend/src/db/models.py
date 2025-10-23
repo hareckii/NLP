@@ -20,7 +20,7 @@ class WordModel(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     word: Mapped[str] = mapped_column(String(30))
-    significance: Mapped[float]
+    frequency: Mapped[float]
     file_id: Mapped[int] = mapped_column(
         ForeignKey(
             "files.id",

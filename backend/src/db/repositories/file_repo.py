@@ -5,16 +5,13 @@ from src.db.repositories.repo import Repository
 
 
 class FileRepository(Repository):
-    def __init__(self, session):
+    def __init__(self, session: AsyncSession):
         super().__init__(session)
 
     async def add_file(
-        title: str,
-        text: str,
-        session: AsyncSession,
-        ) -> int:
-
-        file = FileModel(title, text)
-        session.add(file)
-        await session.flush()
-        return file.id
+        self,
+        file: FileModel,
+        ) -> FileModel:
+        self.session.add(file)
+        await self.session.flush()
+        return file
