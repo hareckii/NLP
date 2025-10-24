@@ -6,6 +6,7 @@ class FileModel(BaseModel):
     text: str
 
 
-class WordModel(BaseModel):
+class WordWithIdfModel(BaseModel):
     word: str
     frequency: int
+    idf: float

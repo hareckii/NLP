@@ -11,16 +11,6 @@ from src.documents.file_processor import FileProcessor
 
 router = APIRouter(prefix="/documents")
 
-async def get_session():
-    try:
-        async with database.async_session_maker() as session:
-            yield session
-            await session.commit()
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
-            detail="fucked up",
-            )
 
 @router.delete("/reboot_db")
 async def reboot_db():
@@ -32,7 +22,7 @@ async def reboot_db():
 @router.post("/add")
 async def add_file(
     file: UploadFile,
-    session: Annotated[AsyncSession, Depends(get_session)],
+    session: Annotated[AsyncSession, Depends(database.get_session)],
     title: str | None = None,
 ):
     # check txt format

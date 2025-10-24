@@ -1,5 +1,6 @@
 import asyncio
 
+from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -34,6 +35,17 @@ class Database:
         """Удаление всех таблиц (для тестов)"""
         async with self.engine.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)
+
+    async def get_session(self):
+        try:
+            async with self.async_session_maker() as session:
+                yield session
+                await session.commit()
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                detail=f"Error with db query {e}",
+            )
 
 
 # Создаем экземпляр базы данных

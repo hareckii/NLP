@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db.models import FileModel
@@ -15,3 +16,11 @@ class FileRepository(Repository):
         self.session.add(file)
         await self.session.flush()
         return file
+
+    async def select_files(
+        self,
+        file_ids: list[int],
+    ) -> list[FileModel]:
+        query = select(FileModel).where(FileModel.id.in_(file_ids)).limit(10)
+        res = await self.session.execute(query)
+        return res.scalars().all()
