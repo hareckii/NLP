@@ -1,6 +1,7 @@
 import asyncio
 
 from fastapi import HTTPException, status
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -41,7 +42,7 @@ class Database:
             async with self.async_session_maker() as session:
                 yield session
                 await session.commit()
-        except Exception as e:
+        except SQLAlchemyError as e:
             raise HTTPException(
                 status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
                 detail=f"Error with db query {e}",
