@@ -1,11 +1,13 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db.config import database
+from src.db.models import FileModel
 from src.db.repositories.file_repo import FileRepository
 from src.db.repositories.word_repo import WordRepository
+from src.documents.file_processor import FileProcessor
 from src.search_logic.algorithm import vector_search
 
 router = APIRouter(prefix="/search")
@@ -16,20 +18,35 @@ async def search_document(
     message: str,
     session: Annotated[AsyncSession, Depends(database.get_session)],
 ):
-    # get words with idf value grouped by file id
+    # process query
+    file = FileModel(text=message)
+    processor = FileProcessor(file)
+    query_words_counter = processor.process()
+
+    if not query_words_counter:
+        raise HTTPException(
+            status_code=404,
+            detail="Do not find any matched files",
+        )
+
+    # get words with idf values
     word_repo = WordRepository(session)
-    files = await word_repo.get_words_with_log_nf()
+    words = await word_repo.get_words_with_idf()
+    # get files with search result
+    search_results = vector_search(query_words_counter, words)
 
-    # compute significance by vector search
-    significances = vector_search(message, files)
-    print(f"{significances=}")
-    file_ids = [sign["file_id"] for sign in significances if sign["value"] > 0]
+    # get all files
     file_repo = FileRepository(session)
-    res = await file_repo.select_files(file_ids)
+    files_data = await file_repo.select_files(
+        [file[0] for file in search_results],
+        )
 
-    # sort selected values
+    # sort files
     order_mapping = {
-        item: index for index, item in enumerate(file_ids)
+        file_id: idx for idx, (file_id, _) in enumerate(search_results)
     }
+    sorted_files = sorted(
+        files_data, key=lambda x: order_mapping.get(x.id, float("inf")),
+    )
 
-    return sorted(res, key=lambda x: order_mapping[x.id])
+    return [{"id": file.id, "title": file.title} for file in sorted_files]

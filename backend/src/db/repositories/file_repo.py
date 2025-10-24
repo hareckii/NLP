@@ -21,6 +21,10 @@ class FileRepository(Repository):
         self,
         file_ids: list[int],
     ) -> list[FileModel]:
-        query = select(FileModel).where(FileModel.id.in_(file_ids)).limit(10)
+        query = (
+            select(FileModel).
+            where(FileModel.id.in_(file_ids)).
+            limit(10)
+            )
         res = await self.session.execute(query)
         return res.scalars().all()

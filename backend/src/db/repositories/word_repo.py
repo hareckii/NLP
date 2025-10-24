@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db.models import FileModel, WordModel
 from src.db.repositories.repo import Repository
-from src.documents.models import WordWithIdfModel
+from src.documents.models import SearchWordModel
 
 
 class WordRepository(Repository):
@@ -18,7 +18,9 @@ class WordRepository(Repository):
     ) -> None:
         self.session.add(word)
 
-    async def get_words_with_log_nf(self) -> dict[int, list[WordWithIdfModel]]:
+    async def get_words_with_idf(
+        self,
+    ) -> dict[int, list[SearchWordModel]]:
         """get value log(n/pi) for every word,
         group by file_id
 
@@ -60,7 +62,7 @@ class WordRepository(Repository):
 
             if doc_count > 0:
                 log_nf = math.log(total_docs / doc_count)
-                word_with_idf = WordWithIdfModel(
+                word_with_idf = SearchWordModel(
                     word=word_model.word,
                     frequency=word_model.frequency,
                     file_id=file_id,
