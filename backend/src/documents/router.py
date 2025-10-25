@@ -60,6 +60,14 @@ async def add_file(
 
     return {'detail': "successfully add file"}
 
+@router.get("/document")
+async def get_document_by_id(
+    id: int,
+    session: Annotated[AsyncSession, Depends(database.get_session)],
+    ):
+    repo = FileRepository(session)
+    res = await repo.select_file(id)
+    return res
 
 @router.delete("/delete")
 async def delete_doc(title: str):

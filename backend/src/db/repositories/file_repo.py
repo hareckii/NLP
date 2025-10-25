@@ -28,3 +28,11 @@ class FileRepository(Repository):
             )
         res = await self.session.execute(query)
         return res.scalars().all()
+
+    async def select_file(
+        self,
+        file_id: int,
+    ) -> list[FileModel]:
+        query = select(FileModel).where(FileModel.id.is_(file_id))
+        res = await self.session.execute(query)
+        return res.scalars().first()
