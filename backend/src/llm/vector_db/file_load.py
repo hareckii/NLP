@@ -10,8 +10,8 @@ def load_file(text: str):
 
     # Разбиение текста на чанки
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=100,
-        chunk_overlap=20,
+        chunk_size=500,
+        chunk_overlap=70,
     )
 
     chunks = text_splitter.split_documents([doc])
