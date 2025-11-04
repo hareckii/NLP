@@ -1,6 +1,6 @@
 from langchain_huggingface import HuggingFaceEmbeddings  # type: ignore
 
 embeddings = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-mpnet-base-v2",
+    model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
 )
 

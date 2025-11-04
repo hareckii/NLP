@@ -40,6 +40,7 @@ async def search_document(
     files_data = await file_repo.select_files(
         [file[0] for file in search_results],
         )
+    similarities  = [file[1] for file in search_results]
 
     # sort files
     order_mapping = {
@@ -48,5 +49,5 @@ async def search_document(
     sorted_files = sorted(
         files_data, key=lambda x: order_mapping.get(x.id, float("inf")),
     )
-
-    return [{"id": file.id, "title": file.title} for file in sorted_files]
+    result_files = [{"id": file.id, "title": file.title, "similarity": similarities[i]} for i, file in enumerate(sorted_files)]
+    return result_files
