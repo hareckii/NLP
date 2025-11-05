@@ -4,29 +4,17 @@ from tkinter import scrolledtext
 import os
 import requests
 from loguru import logger
+from metrics_window import EvaluationWindow
 
 
-sample_results = [
-    {
-        "title": "Домашняя паста: пошаговый рецепт",
-        "snippet": "Свежая паста готовится всего из двух ингредиентов — муки и яиц. Следуйте простым шагам, и вы получите идеальное тесто...",
-        "rank": 0.92,
-        "path": r"C:\Docs\pasta_recipe.txt"
-    },
-    {
-        "title": "Лучшие специи для мяса",
-        "snippet": "Чтобы подчеркнуть вкус мяса, используйте розмарин, тимьян, чеснок и чёрный перец. Эти специи гармонично сочетаются...",
-        "rank": 0.88,
-        "path": r"C:\Docs\meat_spices.txt"
-    },
-    {
-        "title": "Рецепты здорового завтрака",
-        "snippet": "Здоровый завтрак должен быть богат белками и клетчаткой. Попробуйте овсянку с ягодами, тост с авокадо или омлет с овощами...",
-        "rank": 0.83,
-        "path": r"C:\Docs\healthy_breakfast.txt"
-    },
-]
-
+results = {
+    1: [3, 1, 7, 2, 4],
+    2: [8, 2, 5, 3]
+}
+qrels = {
+    1: {1, 2},
+    2: {2, 8, 9}
+}
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -51,6 +39,17 @@ class App(tk.Tk):
 
         # Показать стартовую страницу
         self.show_frame(StartPage)
+
+        menubar = tk.Menu(self)
+        eval_menu = tk.Menu(menubar, tearoff=0)
+        if results:
+            eval_menu.add_command(label="Оценить по метрикам", command=lambda: EvaluationWindow(self))        
+            menubar.add_cascade(label="Оценка", menu=eval_menu)
+            self.config(menu=menubar)
+        else:
+            messagebox.showwarning("Внимание", "Введите поисковый запрос.")
+            return
+            
 
     def show_frame(self, page_class):
         """Переключение между страницами"""
@@ -209,8 +208,9 @@ class SearchPage(tk.Frame):
                 messagebox.showerror("Ошибка", f"Ошибка {response_llm.status_code}: {error_data.get('detail', 'Неизвестная ошибка')}")
         else:
             result_llm = response_llm.json()
-        self.llm_output.delete(1.0, tk.END)
-        self.llm_output.insert(tk.END, f"LLM-ответ для запроса: "+ result_llm)
+        if result_llm:
+            self.llm_output.delete(1.0, tk.END)
+            self.llm_output.insert(tk.END, f"LLM-ответ для запроса: "+ result_llm)
         self.show_results(results)
 
     # --- Отображение результатов ---
@@ -229,12 +229,12 @@ class SearchPage(tk.Frame):
 
             title_label = tk.Label(card, text=doc["title"], fg="#1a0dab", cursor="hand2",
                                    font=("Arial", 12, "underline"), bg="white", anchor="w", justify="left")
-            title_label.pack(anchor="w")
+            title_label.pack(anchor="w", fill="x")
             title_label.bind("<Button-1>", lambda e, p=doc["id"]:  self.open_doc(p))
 
             snippet_label = tk.Label(card, text=doc["similarity"], wraplength=800, justify="left",
                                      font=("Arial", 10), bg="white", fg="#4d4d4d")
-            snippet_label.pack(anchor="w", pady=2)
+            snippet_label.pack(anchor="w", pady=2, fill="x")
 
     def open_doc(self, id):
         url = "http://127.0.0.1:8000/documents/document"
