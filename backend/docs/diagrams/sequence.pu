@@ -16,17 +16,10 @@ rag -> rag: embed search\nrequest
 rag -> vec: get closest chunks
 vec --> rag: return chunks
 rag -> llm: get answer by chunks and\nsearch request
-llm --> rag: return answer and\nconfidence
-rag -> rag: check confidence 
-alt confidence > 90%
-    rag --> api: return answer
-    api --> interface: return answer
-    interface --> user: return answer
-else confidence <= 90%
-    rag --> api: return "Not found"
-    api --> interface: return None
-    interface --> user: return None
-end
+llm --> rag: return answer 
+rag --> api: return answer
+api --> interface: return answer
+interface --> user: return answer
 
 api -> sys: file list request
 sys -> sql: get file ids by words significance from request
