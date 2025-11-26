@@ -21,7 +21,7 @@ async def search_document(
     # process query
     file = FileModel(text=message)
     processor = FileProcessor(file)
-    query_words_counter = processor.process()
+    query_words_counter = processor.get_words()
 
     if not query_words_counter:
         raise HTTPException(
@@ -39,15 +39,19 @@ async def search_document(
     file_repo = FileRepository(session)
     files_data = await file_repo.select_files(
         [file[0] for file in search_results],
-        )
-    similarities  = [file[1] for file in search_results]
+    )
+    similarities = [file[1] for file in search_results]
 
     # sort files
     order_mapping = {
         file_id: idx for idx, (file_id, _) in enumerate(search_results)
     }
     sorted_files = sorted(
-        files_data, key=lambda x: order_mapping.get(x.id, float("inf")),
+        files_data,
+        key=lambda x: order_mapping.get(x.id, float("inf")),
     )
-    result_files = [{"id": file.id, "title": file.title, "similarity": similarities[i]} for i, file in enumerate(sorted_files)]
+    result_files = [
+        {"id": file.id, "title": file.title, "similarity": similarities[i]}
+        for i, file in enumerate(sorted_files)
+    ]
     return result_files

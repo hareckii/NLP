@@ -16,7 +16,7 @@ class Base(DeclarativeBase):
 
 # класс для работы с бд
 class Database:
-    def __init__(self, db_url: str = "sqlite+aiosqlite:///./test_search.db"):
+    def __init__(self, db_url: str = "sqlite+aiosqlite:///./search.db"):
         self.engine = create_async_engine(
             db_url,
             echo=True,

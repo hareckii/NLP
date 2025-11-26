@@ -1,7 +1,16 @@
 from pydantic import BaseModel
 
 
-class FileModel(BaseModel):
+class FileSnapshot(BaseModel):
+    id: int
+    hash_value: str
+    path: str
+
+
+class File(BaseModel):
+    id: int
+    hash_value: str
+    path: str
     title: str
     text: str
 

@@ -24,7 +24,7 @@ class FileProcessor:
 
         self.file: FileModel = file
 
-    def process(self) -> Counter:
+    def get_words(self) -> Counter:
         doc: Doc = Doc(self.file.text)
         doc.segment(self.segmenter)
 
@@ -50,4 +50,3 @@ class FileProcessor:
             lemmas.append(token.lemma)
 
         return Counter(lemmas)
-

@@ -11,6 +11,8 @@ class FileModel(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(40))
     text: Mapped[str]
+    path: Mapped[str]
+    hash_value: Mapped[str]
 
     words: Mapped[list["WordModel"]] = relationship(back_populates="file")
 
