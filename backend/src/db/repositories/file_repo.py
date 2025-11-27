@@ -99,3 +99,37 @@ class FileRepository(Repository):
         except Exception as e:
             await self.session.rollback()
             raise e
+    
+    async def delete_file(
+        self,
+        file_id: int,
+    ) -> bool:
+        """
+        Удаляет файл и все связанные слова.
+        Returns:
+            True если файл был удален, False если файл не найден
+        """
+        try:
+            # Проверяем существование файла
+            existing_file = await self.select_file(file_id)
+            if not existing_file:
+                return False
+
+            # Удаляем связанные слова (каскадное удаление должно сработать автоматически)
+            delete_words_stmt = WordModel.__table__.delete().where(
+                WordModel.file_id == file_id
+            )
+            await self.session.execute(delete_words_stmt)
+
+            # Удаляем файл
+            delete_file_stmt = FileModel.__table__.delete().where(
+                FileModel.id == file_id
+            )
+            result = await self.session.execute(delete_file_stmt)
+            
+            await self.session.flush()
+            return True
+
+        except Exception as e:
+            await self.session.rollback()
+            raise e

@@ -1,10 +1,11 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 from tkinter import scrolledtext
-import os
 import requests
 from loguru import logger
-from metrics_window import EvaluationWindow
+
+from load_files_to_vdb import process_directory_sync
+# from windows.metrics_window import EvaluationWindow
 
 
 results = {
@@ -40,15 +41,15 @@ class App(tk.Tk):
         # Показать стартовую страницу
         self.show_frame(StartPage)
 
-        menubar = tk.Menu(self)
-        eval_menu = tk.Menu(menubar, tearoff=0)
-        if results:
-            eval_menu.add_command(label="Оценить по метрикам", command=lambda: EvaluationWindow(self))        
-            menubar.add_cascade(label="Оценка", menu=eval_menu)
-            self.config(menu=menubar)
-        else:
-            messagebox.showwarning("Внимание", "Введите поисковый запрос.")
-            return
+        # menubar = tk.Menu(self)
+        # eval_menu = tk.Menu(menubar, tearoff=0)
+        # if results:
+        #     eval_menu.add_command(label="Оценить по метрикам", command=lambda: EvaluationWindow(self))        
+        #     menubar.add_cascade(label="Оценка", menu=eval_menu)
+        #     self.config(menu=menubar)
+        # else:
+        #     messagebox.showwarning("Внимание", "Введите поисковый запрос.")
+        #     return
             
 
     def show_frame(self, page_class):
@@ -137,7 +138,7 @@ class SearchPage(tk.Frame):
             fg="#f84f4f",
             bg="#f5f5f5"
         )
-        title_label.pack( padx=(0, 10),  side="left")
+        title_label.pack(padx=(0, 10), side="left")
         title2_label = tk.Label(
             header,
             text="Cooking Hub",
@@ -145,7 +146,7 @@ class SearchPage(tk.Frame):
             fg="#000000",
             bg="#f5f5f5"
         )
-        title2_label.pack( side="left")
+        title2_label.pack(side="left")
 
         # Кнопка "Назад"
         tk.Button(self, text="Назад", bg="#e0e0e0", relief="flat",
@@ -158,6 +159,11 @@ class SearchPage(tk.Frame):
         tk.Label(top_frame, text="Поисковый запрос:", font=("Arial", 11), bg="#f5f5f5").pack(side="left")
         self.query_entry = tk.Entry(top_frame, font=("Arial", 11))
         self.query_entry.pack(side="left", fill="x", expand=True, padx=5)
+        
+        # Кнопка выбора папки
+        tk.Button(top_frame, text="📁 Выбрать папку", font=("Arial", 10), 
+                  command=self.select_folder, bg="#e8f4fd", relief="flat").pack(side="right", padx=(5, 0))
+        
         tk.Button(top_frame, text="Поиск", font=("Arial", 11, "bold"), command=self.on_search).pack(side="right")
         self.query_entry.bind("<Return>", self.on_search)
 
@@ -168,6 +174,22 @@ class SearchPage(tk.Frame):
         tk.Label(middle_frame, text="Ответ от ИИ", font=("Arial", 11), bg="#f5f5f5").pack(anchor="w")
         self.llm_output = tk.Text(middle_frame, height=4, font=("Consolas", 10), wrap="word", bg="white")
         self.llm_output.pack(fill="x", expand=False)
+
+        # ---------- Информация о выбранной папке ----------
+        self.folder_info_frame = tk.Frame(self, bg="#f5f5f5")
+        self.folder_info_frame.pack(fill="x", padx=10, pady=(0, 5))
+        
+        self.folder_label = tk.Label(
+            self.folder_info_frame, 
+            text="Папка не выбрана", 
+            font=("Arial", 9), 
+            bg="#f5f5f5", 
+            fg="#666666",
+            wraplength=600
+        )
+        self.folder_label.pack(anchor="w")
+        
+        self.selected_folder_path = None
 
         # ---------- Результаты поиска ----------
         bottom_frame = tk.Frame(self, bg="#f5f5f5")
@@ -187,31 +209,62 @@ class SearchPage(tk.Frame):
         self.results_frame = tk.Frame(scrollable_frame, bg="#f5f5f5")
         self.results_frame.pack(fill="both", expand=True)
 
+    def select_folder(self):
+        """Выбор папки на устройстве"""
+        folder_path = filedialog.askdirectory(
+            title="Выберите папку с документами",
+            initialdir="/home/hareckii/university/cooking_hub_docs"  # Можно изменить на нужную стартовую директорию
+        )
+        
+        if folder_path:
+            self.selected_folder_path = folder_path
+    
+            # Опционально: автоматически загрузить файлы из папки
+            self.load_files_from_folder(folder_path)
+
+    def load_files_from_folder(self, folder_path):
+        """Загрузка файлов из выбранной папки (можно доработать)"""
+        process_directory_sync(folder_path)
+
     # --- Логика поиска ---
-    def on_search(self, event = None):
-        url = "http://127.0.0.1:8000/search/ask"
+    def on_search(self, event=None):
+        url = "http://127.0.0.1:8000/documents/search/"
         url_llm = "http://127.0.0.1:8000/llm/ask"
         query = self.query_entry.get().strip()
         if not query:
             messagebox.showwarning("Внимание", "Введите поисковый запрос.")
             return
         
-        response = requests.get(url=url, params={"message": query})
-        if response.status_code != 200:
+        # Если выбрана папка, можно добавить её в параметры поиска
+        search_params = {"message": query}
+        if self.selected_folder_path:
+            search_params["folder_path"] = self.selected_folder_path
+        
+        try:
+            response = requests.get(url=url, params=search_params)
+            if response.status_code != 200:
                 error_data = response.json()
                 messagebox.showerror("Ошибка", f"Ошибка {response.status_code}: {error_data.get('detail', 'Неизвестная ошибка')}")
-        else:
-            results = response.json()
-        response_llm = requests.get(url=url_llm, params={"message": query})
-        if response_llm.status_code != 200:
+                return
+            else:
+                results = response.json()
+            
+            response_llm = requests.get(url=url_llm, params={"message": query})
+            if response_llm.status_code != 200:
                 error_data = response_llm.json()
                 messagebox.showerror("Ошибка", f"Ошибка {response_llm.status_code}: {error_data.get('detail', 'Неизвестная ошибка')}")
-        else:
-            result_llm = response_llm.json()
-        if result_llm:
-            self.llm_output.delete(1.0, tk.END)
-            self.llm_output.insert(tk.END, f"LLM-ответ для запроса: "+ result_llm)
-        self.show_results(results)
+                return
+            else:
+                result_llm = response_llm.json()
+            
+            if result_llm:
+                self.llm_output.delete(1.0, tk.END)
+                self.llm_output.insert(tk.END, f"LLM-ответ для запроса: " + result_llm)
+            
+            self.show_results(results)
+            
+        except requests.exceptions.ConnectionError:
+            messagebox.showerror("Ошибка", "Не удалось подключиться к серверу. Проверьте, запущен ли сервер.")
 
     # --- Отображение результатов ---
     def show_results(self, results):
@@ -230,7 +283,7 @@ class SearchPage(tk.Frame):
             title_label = tk.Label(card, text=doc["title"], fg="#1a0dab", cursor="hand2",
                                    font=("Arial", 12, "underline"), bg="white", anchor="w", justify="left")
             title_label.pack(anchor="w", fill="x")
-            title_label.bind("<Button-1>", lambda e, p=doc["id"]:  self.open_doc(p))
+            title_label.bind("<Button-1>", lambda e, p=doc["id"]: self.open_doc(p))
 
             snippet_label = tk.Label(card, text=doc["similarity"], wraplength=800, justify="left",
                                      font=("Arial", 10), bg="white", fg="#4d4d4d")
@@ -240,8 +293,8 @@ class SearchPage(tk.Frame):
         url = "http://127.0.0.1:8000/documents/document"
         response = requests.get(url=url, params={"id": id})
         if response.status_code != 200:
-                error_data = response.json()
-                messagebox.showerror("Ошибка", f"Ошибка {response.status_code}: {error_data.get('detail', 'Неизвестная ошибка')}")
+            error_data = response.json()
+            messagebox.showerror("Ошибка", f"Ошибка {response.status_code}: {error_data.get('detail', 'Неизвестная ошибка')}")
         else:
             result = response.json()
             TextWindow(parent=self, title=result["title"], content=result["text"])
@@ -297,13 +350,7 @@ class TextWindow(tk.Toplevel):
         close_btn.pack(pady=(0, 15))
 
 
-# ==============================================================
-# Запуск приложения
-# ==============================================================
 
-if __name__ == "__main__":
-    app = App()
-    app.mainloop()
 
 
 
