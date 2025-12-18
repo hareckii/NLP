@@ -63,14 +63,14 @@ async def detect_language(file: UploadFile = File(...)):
                 processing_time=data['time']
             )
             session.add(result)
-        
+        doc_id = doc.id
         session.commit()
         session.close()
         
         return {
             "filename": file.filename,
             "results": results,
-            "document_id": doc.id
+            "document_id": doc_id
         }
         
     except Exception as e:
