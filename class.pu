@@ -1,0 +1,42 @@
+@startuml
+class DataLoader {
+  + download_training_data(lang): str
+  + get_samples(lang): list
+}
+
+class NgramModel {
+  + get_ngrams(text): list
+  + get_distance(doc_profile, cat_profile): float
+}
+
+class LanguageModel {
+  + forward(x): tensor
+}
+
+class ModelTrainer {
+  + train()
+  - get_feature(text, index, vocab_size): list
+}
+
+class Analyzer {
+  + analyze_file(file_path): dict
+  + compute_stats(collection_results): dict
+  + format_output(collection_results, stats): str
+  - get_text_from_html(file_path): str
+  - get_feature(text, index, vocab_size): list
+  - load_profile(cur, method, lang): list
+  - determine_true_lang(file_path): str
+}
+
+class App {
+  + build_profiles()
+  + analyze_collection()
+  + show_help()
+  + run()
+  - save_results(text)
+}
+
+DataLoader --> ModelTrainer
+ModelTrainer --> Analyzer : uses models
+Analyzer --> App : provides results
+@enduml

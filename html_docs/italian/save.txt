@@ -1,0 +1,43 @@
+Результаты анализа коллекции:
+
+Файл: /home/hareckii/university/NLP/html_docs/italian/01_7 Seconds (singolo).html
+Ngram: Итальянский (время: 0.0102 сек)
+Alpha: Итальянский (время: 0.0016 сек)
+Neural: Итальянский (время: 0.0012 сек)
+
+Файл: /home/hareckii/university/NLP/html_docs/italian/07_Galassia Nana del Boote.html
+Ngram: Итальянский (время: 0.0064 сек)
+Alpha: Итальянский (время: 0.0011 сек)
+Neural: Итальянский (время: 0.0005 сек)
+
+Файл: /home/hareckii/university/NLP/html_docs/italian/08_Roberto Lovera.html
+Ngram: Итальянский (время: 0.0058 сек)
+Alpha: Итальянский (время: 0.0010 сек)
+Neural: Итальянский (время: 0.0006 сек)
+
+Файл: /home/hareckii/university/NLP/html_docs/italian/04_Aginter Press.html
+Ngram: Итальянский (время: 0.0400 сек)
+Alpha: Итальянский (время: 0.0075 сек)
+Neural: Итальянский (время: 0.0027 сек)
+
+Файл: /home/hareckii/university/NLP/html_docs/italian/02_Nazionale femminile di pallama.html
+Ngram: Итальянский (время: 0.0079 сек)
+Alpha: Итальянский (время: 0.0014 сек)
+Neural: Итальянский (время: 0.0006 сек)
+
+Файл: /home/hareckii/university/NLP/html_docs/italian/06_Maulik Pancholy.html
+Ngram: Итальянский (время: 0.0079 сек)
+Alpha: Итальянский (время: 0.0014 сек)
+Neural: Итальянский (время: 0.0006 сек)
+
+Файл: /home/hareckii/university/NLP/html_docs/italian/03_Torre di Sfinale.html
+Ngram: Итальянский (время: 0.0041 сек)
+Alpha: Итальянский (время: 0.0007 сек)
+Neural: Итальянский (время: 0.0003 сек)
+
+Файл: /home/hareckii/university/NLP/html_docs/italian/05_Bitches Ain't Shit.html
+Ngram: Итальянский (время: 0.0019 сек)
+Alpha: Итальянский (время: 0.0003 сек)
+Neural: Итальянский (время: 0.0002 сек)
+
+Сводная статистика:
